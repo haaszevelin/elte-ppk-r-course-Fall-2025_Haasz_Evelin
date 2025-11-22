@@ -167,9 +167,30 @@ tribble(~name, ~Lime, ~`White rum`, ~`Cane sugar`, ~`Coca-cola`, ~Mint, ~Soda,
 ```
 
 ```{r}
+# gathering unique cocktail and ingredient names
+cocktails <- unique(cleaned_cocktail_data$name)
+ingredients <- unique(cleaned_cocktail_data$ingredients)
 
+# creating an empty matrix
+cocktail_matrix <- matrix("", nrow = length(cocktails), ncol = length(ingredients),
+                          dimnames = list(cocktails, ingredients))
 
+# "X" for present ingredients
+for(i in seq_len(nrow(cleaned_cocktail_data))) {
+  cocktail <- cleaned_cocktail_data$name[i]
+  ingredient <- cleaned_cocktail_data$ingredients[i]
+  cocktail_matrix[cocktail, ingredient] <- "X"
+}
 
+# converting to data.frame
+cocktail_matrix <- as.data.frame(cocktail_matrix)
+cocktail_matrix <- tibble::rownames_to_column(cocktail_matrix, var = "name")
+
+# ingredient columns alphabetically
+cocktail_matrix <- cocktail_matrix %>% relocate(name, sort(names(.)[-1]))
+
+# checking result
+view(cocktail_matrix)
 ```
 
 
