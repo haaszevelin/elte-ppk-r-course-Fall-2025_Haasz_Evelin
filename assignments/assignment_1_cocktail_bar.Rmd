@@ -70,6 +70,7 @@ Before opening the bar, you need to find a reliable supplier that has all the in
 ```{r}
 # list of ingredients
 ingredient_list <- cleaned_cocktail_data %>%
+  distinct(ingredients)
   arrange(ingredients)       
 
 # checking the results
@@ -115,7 +116,6 @@ cocktail_max_ingredients <- cleaned_cocktail_data %>%
   filter(num_ingredients == max(num_ingredients))
 
 cocktail_max_ingredients
-
 ```
 
 ## 7. How many ingredients appear in only one cocktail (rare ingredient)?
@@ -140,7 +140,6 @@ cocktails_with_rare_ingredients <- cleaned_cocktail_data %>%
   distinct(name, .keep_all = TRUE)
 
 print(distinct(cocktails_with_rare_ingredients), n = Inf)
-
 ```
 
 ## 9. What are the cocktails without rare ingredients?
@@ -151,7 +150,6 @@ cocktails_without_rare_ingredients <- cleaned_cocktail_data %>%
   distinct(name)  
 
 print(cocktails_without_rare_ingredients, n = Inf)
- 
 ```
 
 ## 10. Create a cheat sheet for the bartender!
@@ -182,7 +180,7 @@ for(i in seq_len(nrow(cleaned_cocktail_data))) {
   cocktail_matrix[cocktail, ingredient] <- "X"
 }
 
-# converting to data.frame
+# converting to df
 cocktail_matrix <- as.data.frame(cocktail_matrix)
 cocktail_matrix <- tibble::rownames_to_column(cocktail_matrix, var = "name")
 
@@ -192,7 +190,6 @@ cocktail_matrix <- cocktail_matrix %>% relocate(name, sort(names(.)[-1]))
 # checking result
 view(cocktail_matrix)
 ```
-
 
 Congrats, the bar is now officially open!
 
