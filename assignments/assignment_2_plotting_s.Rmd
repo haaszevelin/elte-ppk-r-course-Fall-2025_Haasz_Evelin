@@ -21,8 +21,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(tidytuesdayR)
 library(ggplot2)
-library(forcats)
-library(viridis)
+
 ```
 
 ## Task 1: Climbing expeditions
@@ -38,6 +37,9 @@ The 2020-09-22 TidyTueday datasets are about climbing expeditions. From the thre
 -   The bar colors use the viridis palette and light theme.
 
 ```{r}
+library(forcats)
+library(viridis)
+
 # Counting top 15 peaks
 top_peaks_names <- original_expeditions %>%
   count(peak_name, sort = TRUE) %>%
@@ -79,6 +81,10 @@ ggplot(top_peaks_summary, aes(x = peak_name, y = n, fill = season)) +
 
 ## Task 2: PhDs awarded
 
+```{r}
+original_phd_by_field <- read.csv("C:/Users/Haász Evelin/Downloads/phd_by_field.csv")
+```
+
 The 2019-02-19 TidyTueday dataset is about phd-s awarded by year and field. There is only one dataset, it is called `phd_by_field`. Reproduce the plot below!
 
 Notes:
@@ -88,6 +94,27 @@ Notes:
 -   The line size is 1.2, the colors are from the brewer "Dark2" palette. The theme is set to minimal.
 
 ```{r}
+library(scales)
+library(RColorBrewer)
+
+# counting total phds by broad fields
+phd_summary <- original_phd_by_field %>%
+  group_by(year, broad_field) %>%
+  summarize(total_phds = sum(n_phds, na.rm = TRUE), .groups="drop")
+phd_summary
+
+# creating the plot
+ggplot(phd_summary, aes(x = year, y = total_phds, color = broad_field)) +
+  geom_line(size = 1.2) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_color_brewer(palette = "Dark2") +
+  theme_minimal() +
+  labs(title = "Number of awarded Ph. D.-s in the US by year",
+       x = "",
+       y = "",
+       color = "broad_field"
+)
 
 ```
 
