@@ -133,5 +133,35 @@ Notes:
 -   The point size is 2, . The theme is set to light.
 
 ```{r}
+# aggregating commutes by state and mode
+commutes_by_state <- original_commute %>%
+  group_by(state, mode) %>%
+  summarise(total_commutes = sum(n, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = mode, values_from = total_commutes, values_fill = 0)
+
+# adding state region info and abbreviations
+commutes_by_state <- commutes_by_state %>%
+  left_join(
+    tibble(
+      state = state.name,
+      region = state.region,
+      abbrev = state.abb
+    ),
+    by = "state"
+  )
+
+# plotting the data
+ggplot(commutes_by_state, aes(x = Walk, y = Bike)) +
+  geom_point(aes(color = region), size = 2) +      
+  geom_text(aes(label = abbrev), color = "black", vjust = -0.5, size = 3) +  
+  scale_x_log10(labels = comma_format()) +
+  scale_y_log10(labels = comma_format()) +
+  theme_light() +
+  labs(
+    title = "Number of people walking vs. biking to work in each US state",
+    x = "Number of people walking to work (log N)",
+    y = "Number of people biking to work (log N)",
+    color = "Region") +
+    theme(plot.title = element_text(size = 18, hjust = 0.5))
 
 ```
