@@ -29,7 +29,7 @@ library(ggplot2)
 
 There is no dataset for this project. You have to simulate from scratch!
 ```{r}
-# simualting the lightning as a random walk
+# simulating the lightning as a random walk
 random_walk <- function(start_x = 0, start_y = 0, steps = 80, id = "main") {
   y <- seq(start_y + 1, start_y + steps)
   x <- start_x + cumsum(rnorm(steps, mean = 0, sd = 0.5))
@@ -69,7 +69,6 @@ generate_lightning <- function() {
 # running the simulation
 set.seed(123)
 lightning <- generate_lightning()
-
 ```
 
 
@@ -79,7 +78,7 @@ lightning <- generate_lightning()
 ![Lightning](assignment_7_example/example_lightning.png)
 
 ```{r}
-# visualizating data as a static plot
+# visualizing data
 ggplot(lightning, aes(x, -y, group = id, color = id == "main")) +
   geom_path(size = 1) +
   scale_color_manual(values = c("TRUE" = "white", "FALSE" = "lightskyblue")) +
@@ -106,5 +105,4 @@ lightning_anim <- ggplot(lightning, aes(x, -y, group = id, color = id == "main",
   transition_reveal(y)
 
 animate(lightning_anim, nframes = 80, fps = 20, width = 600, height = 800)
-
 ```
