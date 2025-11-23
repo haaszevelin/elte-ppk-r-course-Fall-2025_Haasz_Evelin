@@ -21,7 +21,6 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(tidytuesdayR)
 library(ggplot2)
-
 ```
 
 ## Task 1: Climbing expeditions
@@ -40,29 +39,29 @@ The 2020-09-22 TidyTueday datasets are about climbing expeditions. From the thre
 library(forcats)
 library(viridis)
 
-# Counting top 15 peaks
+# counting top 15 peaks
 top_peaks_names <- original_expeditions %>%
   count(peak_name, sort = TRUE) %>%
   slice_max(n, n = 15) %>%
   pull(peak_name)
 
-# Filtering data for top 15 peaks
+# filtering data for top 15 peaks
 top_peaks_data <- original_expeditions %>%
   filter(peak_name %in% top_peaks_names)
 
-# Counting expeditions per peak per season
+# counting expeditions per peak per season
 top_peaks_summary <- top_peaks_data %>%
   group_by(peak_name, season) %>%
   summarise(n = n(), .groups = "drop")
 
-# Computing total expeditions per peak and reorder factor
+# computing total expeditions per peak and reorder factor
 top_peaks_summary <- top_peaks_summary %>%
   group_by(peak_name) %>%
   mutate(total = sum(n)) %>%
   ungroup() %>%
   mutate(peak_name = fct_reorder(peak_name, total))
 
-# Plot
+# creating the plot
 ggplot(top_peaks_summary, aes(x = peak_name, y = n, fill = season)) +
   geom_col() +
   scale_fill_viridis_d(option = "D") +  # discrete palette for seasons
@@ -115,7 +114,6 @@ ggplot(phd_summary, aes(x = year, y = total_phds, color = broad_field)) +
        y = "",
        color = "broad_field") +
   theme(plot.title = element_text(size = 18, hjust = 0.5))
-
 ```
 
 ## Task 3: Commute in the US
@@ -163,5 +161,4 @@ ggplot(commutes_by_state, aes(x = Walk, y = Bike)) +
     y = "Number of people biking to work (log N)",
     color = "Region") +
     theme(plot.title = element_text(size = 18, hjust = 0.5))
-
 ```
