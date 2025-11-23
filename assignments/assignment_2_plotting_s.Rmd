@@ -113,8 +113,8 @@ ggplot(phd_summary, aes(x = year, y = total_phds, color = broad_field)) +
   labs(title = "Number of awarded Ph. D.-s in the US by year",
        x = "",
        y = "",
-       color = "broad_field"
-)
+       color = "broad_field") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5))
 
 ```
 
