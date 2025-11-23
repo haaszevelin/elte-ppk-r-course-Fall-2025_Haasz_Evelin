@@ -20,9 +20,16 @@ You will have to create 3 plots based on the datasets and instructions detailed 
 knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(tidytuesdayR)
+library(ggplot2)
+library(forcats)
+library(viridis)
 ```
 
 ## Task 1: Climbing expeditions
+
+```{r}
+original_expeditions <- read.csv("C:/Users/Haász Evelin/Downloads/expeditions.csv")
+```
 
 The 2020-09-22 TidyTueday datasets are about climbing expeditions. From the three datasets, use the "expeditions". Reproduce the plot below! Notice a few things:
 
@@ -31,7 +38,43 @@ The 2020-09-22 TidyTueday datasets are about climbing expeditions. From the thre
 -   The bar colors use the viridis palette and light theme.
 
 ```{r}
+# Counting top 15 peaks
+top_peaks_names <- original_expeditions %>%
+  count(peak_name, sort = TRUE) %>%
+  slice_max(n, n = 15) %>%
+  pull(peak_name)
 
+# Filtering data for top 15 peaks
+top_peaks_data <- original_expeditions %>%
+  filter(peak_name %in% top_peaks_names)
+
+# Counting expeditions per peak per season
+top_peaks_summary <- top_peaks_data %>%
+  group_by(peak_name, season) %>%
+  summarise(n = n(), .groups = "drop")
+
+# Computing total expeditions per peak and reorder factor
+top_peaks_summary <- top_peaks_summary %>%
+  group_by(peak_name) %>%
+  mutate(total = sum(n)) %>%
+  ungroup() %>%
+  mutate(peak_name = fct_reorder(peak_name, total))
+
+# Plot
+ggplot(top_peaks_summary, aes(x = peak_name, y = n, fill = season)) +
+  geom_col() +
+  scale_fill_viridis_d(option = "D") +  # discrete palette for seasons
+  coord_flip() +
+  theme_light() +
+  labs(
+    title = "The 15 most popular peaks stacked by season of expedition",
+    x = "",
+    y = "Number of expeditions",
+    fill = "Season"
+  ) +
+  theme(
+    plot.title = element_text(size = 18, hjust = 0.5)
+  )
 ```
 
 ## Task 2: PhDs awarded
@@ -51,6 +94,10 @@ Notes:
 ## Task 3: Commute in the US
 
 The 2019-11-05 TidyTueday dataset is about commuting to work in each city in the US by bike or on foot. There is only one dataset, it is called `commute`. Reproduce the plot below!
+
+```{r}
+original_commute <- read.csv("C:/Users/Haász Evelin/Downloads/commute.csv")
+```
 
 Notes:
 
