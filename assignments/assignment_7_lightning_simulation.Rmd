@@ -9,6 +9,8 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(gganimate)
+library(ggplot2)
 ```
 
 
@@ -26,12 +28,83 @@ library(tidyverse)
 # Dataset
 
 There is no dataset for this project. You have to simulate from scratch!
+```{r}
+# simualting the lightning as a random walk
+random_walk <- function(start_x = 0, start_y = 0, steps = 80, id = "main") {
+  y <- seq(start_y + 1, start_y + steps)
+  x <- start_x + cumsum(rnorm(steps, mean = 0, sd = 0.5))
+
+  tibble(
+    x = x,
+    y = y,
+    id = id
+  )
+}
+
+# creating forks with 1% chance in each step
+make_forks <- function(bolt, steps = 40) {
+  fork_points <- bolt %>% 
+    filter(runif(n()) < 0.01)
+
+  if (nrow(fork_points) == 0) {
+    return(tibble())
+  }
+
+# for each fork point, creating a new new random walk
+  purrr::map2_dfr(
+    fork_points$x,
+    fork_points$y,
+    ~ random_walk(.x, .y, steps = steps,
+                  id = paste0("fork_", round(.x, 2), "_", .y))
+  )
+}
+
+# generating the lightning and its forks
+generate_lightning <- function() {
+  main <- random_walk(start_x = 0, start_y = 0, steps = 80, id = "main")
+  forks <- make_forks(main, steps = 40)
+  bind_rows(main, forks)
+}
+
+# running the simulation
+set.seed(123)
+lightning <- generate_lightning()
+
+```
+
+
 
 # Example lightning
 
 ![Lightning](assignment_7_example/example_lightning.png)
 
 ```{r}
+# visualizating data as a static plot
+ggplot(lightning, aes(x, -y, group = id, color = id == "main")) +
+  geom_path(size = 1) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "lightskyblue")) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "black", color = NA),
+    plot.background = element_rect(fill = "black", color = NA),
+    legend.position = "none"
+  )
 
 ```
 
+```{r}
+# animated plot
+lightning_anim <- ggplot(lightning, aes(x, -y, group = id, color = id == "main", frame = y)) +
+  geom_path(size = 1) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "lightskyblue")) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "black", color = NA),
+    plot.background = element_rect(fill = "black", color = NA),
+    legend.position = "none"
+  ) +
+  transition_reveal(y)
+
+animate(lightning_anim, nframes = 80, fps = 20, width = 600, height = 800)
+
+```
